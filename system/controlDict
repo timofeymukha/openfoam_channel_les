@@ -1,0 +1,104 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pimpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         300;
+
+deltaT          2e-3;
+
+writeControl    runTime;
+
+writeInterval   50;
+
+purgeWrite      2;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression off;
+ 
+timeFormat      general;
+
+timePrecision   7;
+
+runTimeModifiable true;
+
+OptimisationSwitches
+{
+    fileHandler collated;
+    maxThreadFileBufferSize 2e9;
+}
+
+functions
+{
+    uTau    
+    {
+        type patchExpression;
+        patches ( bottomWall topWall);
+        outputControlMode timeStep;
+        outputInterval 1;
+        expression "sqrt(nu*mag(snGrad(U)))";
+        verbose true;
+        accumulations ( average );
+    }
+
+
+    fieldAverage
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   writeTime;
+        resetOnRestart  false;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+            p
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+
+        );
+    }
+
+
+}
+
+libs (
+    "libOpenFOAM.so"
+    "libsimpleFunctionObjects.so"
+    "libsimpleSwakFunctionObjects.so"
+    "libswakFunctionObjects.so"
+    );
+
+// ************************************************************************* //
