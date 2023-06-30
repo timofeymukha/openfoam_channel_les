@@ -53,24 +53,26 @@ OptimisationSwitches
 
 functions
 {
-    uTau    
+    uTau
     {
         type patchExpression;
         patches ( bottomWall topWall);
         outputControlMode timeStep;
-        outputInterval 1;
+        outputInterval 2;
         expression "sqrt(nu*mag(snGrad(U)))";
         verbose true;
         accumulations ( average );
+        writeStartTime no;
+        enabled false;
     }
 
 
     fieldAverage
     {
         type            fieldAverage;
-        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        libs ( "libfieldFunctionObjects.so" );
         enabled         true;
-        outputControl   writeTime;
+        writeControl   writeTime;
         resetOnRestart  false;
 
         fields

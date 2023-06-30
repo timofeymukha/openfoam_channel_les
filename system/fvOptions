@@ -15,23 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-// OF 2.3.1
-//momentumSource
-//{
-//   type            pressureGradientExplicitSource;
-//   active          on;            //on/off switch
-//   selectionMode   all;       //cellSet // points //cellZone
-
-//   pressureGradientExplicitSourceCoeffs
-//   {
-//       fieldNames  (U);
-//       Ubar        (1.0 0 0 );
-//   }
-//}
-
-
-//OF 3.0.1
 momentumSource
 {
    type            meanVelocityForce;
@@ -40,7 +23,7 @@ momentumSource
    meanVelocityForceCoeffs
    {
       selectionMode   all;                    // Apply force to all cells
-      fieldNames          (U);                    // Name of velocity field
+      fields          (U);                    // Name of velocity field
       Ubar            (1.0 0 0);             // Desired mean velocity
 //    relaxation      0.2;                    // Optional relaxation factor
     }
