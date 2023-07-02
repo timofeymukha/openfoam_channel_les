@@ -43,7 +43,7 @@ solvers
         relTol          0.1;
     }
 
-    U
+    UFinal
     {
         $U;
         tolerance       1e-05;
@@ -51,13 +51,12 @@ solvers
     }
 }
 
-PISO
+PIMPLE
 {
     nCorrectors     4;
     nNonOrthogonalCorrectors 0;
     pRefCell        1001;
     pRefValue       0;
 }
-
 
 // ************************************************************************* //
