@@ -10,8 +10,8 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "840";
-    object      p;
+    location    "0";
+    object      nut;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
