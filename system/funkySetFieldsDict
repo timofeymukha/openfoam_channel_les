@@ -22,9 +22,6 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-retau 1000;
-reb #eval{1/5e-5}; 
-
 expressions
 (
     perturbations
@@ -39,6 +36,7 @@ expressions
 //beta #eval{$kz * 4 / 3};
 
         field U;
+        keepPatches true;
         expression "vector($utau /0.41*log(1.0 + dist() * $utau / $nu) + $utau * 5.5 + $eps * $kz * sin($kx * pos().x) * cos($kz * pos().z), $eps * sin($kx * pos().x) * sin($kz * pos().z), -1 * $eps * $kx * cos($kx * pos().x) * sin($kz * pos().z))";
     }
 );

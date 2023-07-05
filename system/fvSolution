@@ -39,14 +39,14 @@ solvers
     {
         solver          PBiCG;
         preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0.1;
+        tolerance       1e-07;
+        relTol          0.01;
     }
 
     UFinal
     {
         $U;
-        tolerance       1e-05;
+        tolerance       1e-07;
         relTol          0;
     }
 }
