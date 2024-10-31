@@ -1,0 +1,23 @@
+
+    surfaces
+    {
+        type            surfaces;
+        libs            (sampling);
+        writeControl    runTime;
+        writeInterval   0.001;
+
+        surfaceFormat   foam;
+        fields          (p);
+
+        // interpolationScheme cellPoint;  //<- default
+
+        surfaces
+        {
+            inlet
+            {
+                type            patch;
+                patches         (inlet);
+                interpolate     false;
+            }
+        }
+    }

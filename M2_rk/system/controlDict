@@ -1,0 +1,207 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pimpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         500;
+
+deltaT          0.001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   50;
+
+purgeWrite      2;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression off;
+ 
+timeFormat      general;
+
+timePrecision   7;
+
+runTimeModifiable true;
+
+adjustTimeStep  no;
+
+maxCo 0.5;
+
+OptimisationSwitches
+{
+    fileHandler collated;
+    maxThreadFileBufferSize 0;
+}
+
+functions
+{
+
+#include calcBudgets
+#include probes
+
+
+    vorticity1
+    {
+        type        vorticity;
+        libs        (fieldFunctionObjects);
+
+        enabled         true;
+        executeControl  timeStep;
+        executeInterval 1;
+        writeControl    writeTime;
+    }
+
+    yPlus1
+    {
+        // Mandatory entries (unmodifiable)
+        type            yPlus;
+        libs            (fieldFunctionObjects);
+
+        // Optional (inherited) entries
+        writeToFile     true;
+        enabled         true;
+        log             true;
+        executeControl  timeStep;
+        executeInterval 5;
+        writeControl    writeTime;
+    }
+
+    averageYPlus
+    {
+        type            surfaceFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (yPlus);
+        operation       areaAverage;
+        regionType      patch;
+        name            bottomWall;
+
+        // Optional (inherited) entries
+        writeFields     false;
+        writeToFile     true;
+        enabled         true;
+        log             true;
+        executeControl  timeStep;
+        executeInterval 5;
+        writeControl    timeStep;
+        writeInterval   5;
+    }
+
+
+    fieldAverage
+    {
+        type            fieldAverage;
+        libs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        writeControl   writeTime;
+        resetOnRestart  false;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+            p
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+            vorticity
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+            uiuj
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            djui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            djuidjui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            Cui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            uiCui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            Lui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            uiLui
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            Gcp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            uiGcp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+
+        );
+    }
+
+
+}
+
+libs (
+    "libOpenFOAM.so"
+    );
+
+// ************************************************************************* //
