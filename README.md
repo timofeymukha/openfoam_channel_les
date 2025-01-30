@@ -19,7 +19,7 @@ includes:
 toolkit for OpenFOAM. In this project only `funkySetFields` is used.
 - [RKSymFOAM](https://github.com/janneshopman/RKSymFoam) Low-dissipation solver
   with Runge-Kutta time steppers.
-- [runTimeChannelBudged](https://github.com/janneshopman/runTimeChannelBudgets)
+- [runTimeChannelBudgets](https://github.com/janneshopman/runTimeChannelBudgets)
   Tool for computing TKE budget terms.
 - [ofreaders](https://gitlab.com/chalmers-marine-technology/ofreaders/) Tool for
 handling various OpenFOAM-generated files in Python. Here used for converting
