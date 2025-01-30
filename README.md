@@ -10,6 +10,23 @@ The M2_rk and M2_sigma cases correspond to simulations on the M2 grid using the
 [RKSymFOAM](https://github.com/janneshopman/RKSymFoam) solver, and the Sigma LES
 model.
 
+## Running the cases
+
+A typical Allrun script is provided inside M1.
+Things are quite straightforward.
+But of course the user should first modify the decomposeParDict file to
+select the appropriate number of ranks.
+Also it does not account for the restart after transient ends and
+the turbulent statistics need to be reset (unless fieldAverage has been
+disabled during the transient phase).
+
+Our suggestion is to keep fieldAverage always on, first run the case from
+0 to 250, look at the statistics and see if they are generally reasonable.
+Then delete all the `250/*Mean` files and the `250/uniform` folders and
+run the case up to time 750. It is always a good idea to look at statistics
+earlier, even if they are contaminated by transients. They typically provide
+a good inidcation on whether the case is correctly set up.
+
 ## Software
 
 All the results were generated using OpenFOAM v2306. Additional software

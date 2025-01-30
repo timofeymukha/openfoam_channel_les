@@ -1,0 +1,6 @@
+#!/bin/sh
+decomposePar
+mpirun -n 192 pimpleFoam -parallel
+postChannelFlow -latestTime
+channelBudgets -latestTime
+
