@@ -29,11 +29,12 @@ probe data to HDF5.
 
 ## Directory structure
 
-- The folder `scripts` contains Python scripts that can be used to generate
-figures and compute quantities like spectra.
+- The folder `analysis_scripts` contains Python scripts that can be used to generate
+figures found in the paper, and compute quantities like spectra.
 - The folder `dns` contains a bash script for downloading the DNS data by Lee
-and Moser (2015).
-
+and Moser (2015). The paper also makes use of another DNS dataset for skewness and
+flatness, obtained by us through private communication with P. Schlatter and S.
+Toosi at FAU, Germany. As such, we are not at liberty to share it publically.
 
 ## Data for each case
 
