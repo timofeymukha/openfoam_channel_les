@@ -467,7 +467,7 @@ def vorticity_fluctuations():
         )
 
     plt.plot(dns_mean[:, 1], dns_omega[:, 2], "k", lw=1, label="DNS")
-    plt.plot(dns_mean[:, 1], dns_omega[:, 5], "k", lw=1)
+    plt.plot(dns_mean[:, 1], dns_omega[:, 5], "--k", lw=1)
     plt.xlim(1, 1000)
     plt.ylim(-0.01, 0.05)
     plt.ylabel(r"$\overline {\omega_x'\omega_x'}$, $\overline {\omega_x'\omega_y'}$")
@@ -494,8 +494,8 @@ def vorticity_fluctuations():
             color="C" + str(i + 4),
         )
 
-    plt.plot(dns_mean[:, 1], dns_omega[:, 3], "k", lw=1, label="DNS")
-    plt.plot(dns_mean[:, 1], dns_omega[:, 4], "--k", lw=1)
+    plt.plot(dns_mean[:, 1], dns_omega[:, 3], ":k", lw=1, label="DNS")
+    plt.plot(dns_mean[:, 1], dns_omega[:, 4], "-.k", lw=1)
     plt.xlim(1, 1000)
     plt.ylim(0, 0.2)
     plt.ylabel(r"$\overline {\omega_y'\omega_y'}$, $\overline {\omega_z'\omega_z'}$")
