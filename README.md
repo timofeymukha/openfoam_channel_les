@@ -47,7 +47,9 @@ probe data to HDF5.
 ## Directory structure
 
 - The folder `analysis_scripts` contains Python scripts that can be used to generate
-figures found in the paper, and compute quantities like spectra.
+figures found in the paper, and compute quantities like spectra. The scripts are 
+meant to be launched from inside the `analsyis_scripts` folder directly, otherwise
+you will need to change the paths to the data inside the scrips.
 - The folder `dns` contains a bash script for downloading the DNS data by Lee
 and Moser (2015). The paper also makes use of another DNS dataset for skewness and
 flatness, obtained by us through private communication with P. Schlatter and S.
@@ -55,16 +57,18 @@ Toosi at FAU, Germany. As such, we are not at liberty to share it publically.
 
 ## Data for each case
 
-For each of the cases the following is provided:
+For each of the cases the following is provided for most of the simulation cases.
+For auxillary simulations, such as those at Reynolds number 180, some things are
+omitted, since we did not perform probe sampling.
 
 - A dummy `0.org` directory with constant initial conditions.
 - A `constant` directory, with no mesh.
 - A `system` directory with all the necessary configuration files, including a
   `blockMeshDict` to generate the grid.
 - A `postProcessing` directory with subdirectory `collapsedFields` containing
-  the statistics at time 750 and (for selected cases) subdirectory
+  the statistics at the latest time and (for selected cases) subdirectory
   `averageYPlus` containing the development of spatially-averaged $y^+$ in time.
-- A `graphs/750` directory containing the profiles of the TKE budget terms.  
+- A `graphs` directory containing the profiles of the TKE budget terms.  
 - A `plane_stats.txt` file containing single-point statistics computed using
   probe data. These can be compared to those in the `postProcessing` directory.
 - `z_spectrum_*.txt` files containing the spanwise spectra for each wall-normal
