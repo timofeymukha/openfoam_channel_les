@@ -1,0 +1,45 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.3                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          funkySetFieldsDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+expressions
+(
+    perturbations
+    {
+        eps 3e-2;
+        kx 8;
+        kz 9;
+        nu 1e-4;
+        utau 5.43496e-02;
+
+//alpha #eval{$kx * 8};
+//beta #eval{$kz * 4 / 3};
+
+        field U;
+        keepPatches true;
+        expression "vector($utau /0.41*log(1.0 + dist() * $utau / $nu) + $utau * 5.5 + $eps * $kz * sin($kx * pos().x) * cos($kz * pos().z), $eps * sin($kx * pos().x) * sin($kz * pos().z), -1 * $eps * $kx * cos($kx * pos().x) * sin($kz * pos().z))";
+    }
+);
+
+
+// ************************************************************************* //

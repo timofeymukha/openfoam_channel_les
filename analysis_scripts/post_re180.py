@@ -13,7 +13,7 @@ FIGSIZE = (5, 2.5)
 
 DATA = "../re180_simulations"
 
-case_names = ["M1_re180", "M1_re180_sigma", "M1_re180_vd"]
+case_names = ["M1_re180", "M1_re180_sigma", "M1_re180_smag"]
 colors = ["C4", "C5", "C6"]
 
 SAVE_PATH = "../figures"
@@ -182,8 +182,8 @@ def plot_dissipation():
                       color=f"C{i+4}", linestyle='-',
                       label=labels[i] + r", $\nu_\mathrm{num} / \nu$")
     
-    plt.plot(cases["M1_re180_vd"]["y+"][1:-1],
-                  cases["M1_re180_vd"]["nut"][1:-1] / nu, lw=1, 
+    plt.plot(cases["M1_re180_smag"]["y+"][1:-1],
+                  cases["M1_re180_smag"]["nut"][1:-1] / nu, lw=1, 
                   color=f"C6", linestyle='-',
                   label=r"Smagorinsky, $\nu_\mathrm{sgs} / \nu$")
     
