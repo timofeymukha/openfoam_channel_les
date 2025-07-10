@@ -13,15 +13,17 @@ plt.rcParams.update(
 FIGSIZE = (5, 2.5)
 
 # Path with the simulation cases
-DATA = "."
+DATA = ".."
 
 # Case directories
-case_names = ["M2", "M2_rk"]
+case_names = ["M1", "M1_rk", "M2", "M2_rk"]
 
-labels = ["pimpleFoam", "RKSymFoam"]
+labels = ["M1, pimpleFoam", "M1, RKSymFoam", "M2, pimpleFoam", "M2, RKSymFoam"]
+
+colors = ["maroon", "salmon", "mediumblue", "deepskyblue"]
 
 # Path for saving figures
-SAVE_PATH = "figures"
+SAVE_PATH = "../figures"
 
 # Viscosity
 nu = 5e-5
@@ -44,7 +46,7 @@ dns_utau = 5.00256e-02
 
 
 def read_data():
-    times = ["750", "750"]
+    times = ["750", "750", "750", "750"]
     cases = {}
 
     for i, name in enumerate(case_names):
@@ -152,69 +154,131 @@ def read_data():
 
 cases = read_data()
 
+
 # %% utau errors
-for i, name in enumerate(case_names):
-    error = (cases[name]["utau"] - dns_utau) / dns_utau * 100
-    print(f"{name}: {error}")
+def print_utau_errors():
+    print("Error in u_tau")
+    for i, name in enumerate(case_names):
+        error = (cases[name]["utau"] - dns_utau) / dns_utau * 100
+        print(f"{name}: {error}")
+
+    print("Error in tau_w")
+    for i, name in enumerate(case_names):
+        error = (cases[name]["utau"] ** 2 - dns_utau**2) / dns_utau**2 * 100
+        print(f"{name}: {error}")
 
 
-for i, name in enumerate(case_names):
-    error = (cases[name]["utau"] ** 2 - dns_utau**2) / dns_utau**2 * 100
-    print(f"{name}: {error}")
-
+print_utau_errors()
 
 # %%
-plt.figure(figsize=FIGSIZE)
-plt.subplot(121)
-for i, name in enumerate(case_names):
-    plt.semilogx(
-        cases[name]["y+"],
-        cases[name]["uu"] / cases[name]["utau"] ** 2,
-        lw=1,
-        color="C" + str(i + 4),
-        label=labels[i],
-    )
 
-    plt.plot(
-        cases[name]["y+"],
-        cases[name]["uv"] / cases[name]["utau"] ** 2,
-        "--",
-        lw=1,
-        color="C" + str(i + 4),
-    )
+def plot_re():
+    global labels
+    
+    fig = plt.figure(figsize=FIGSIZE)
+    plt.subplot(121)
+    for i, name in enumerate(case_names):
+        plt.semilogx(
+            cases[name]["y+"],
+            cases[name]["uu"] / cases[name]["utau"] ** 2,
+            lw=1,
+            color=colors[i],
+            label=labels[i],
+        )
+    
+        plt.plot(
+            cases[name]["y+"],
+            cases[name]["uv"] / cases[name]["utau"] ** 2,
+            "--",
+            lw=1,
+            color=colors[i],
+        )
+    
+    plt.plot(dns_mean[:, 1], dns_fluct[:, 2], "k", lw=1, label="DNS")
+    plt.plot(dns_mean[:, 1], dns_fluct[:, 5], "--k", lw=1)
+    plt.xlim(1, 1000)
+    plt.ylim(-1, 12)
+    plt.ylabel(r"$\overline {u'u'}^+$, $\overline {u'v'}^+$")
+    plt.xlabel(r"$y^+$")
+    
+    
+    plt.subplot(122)
+    for i, name in enumerate(case_names):
+        plt.semilogx(
+            cases[name]["y+"],
+            cases[name]["vv"] / cases[name]["utau"] ** 2,
+            "--",
+            lw=1,
+            color=colors[i],
+        )
+        plt.plot(
+            cases[name]["y+"],
+            cases[name]["ww"] / cases[name]["utau"] ** 2,
+            "-.",
+            lw=1,
+            color=colors[i],
+        )
+    
+    
+    plt.plot(dns_mean[:, 1], dns_fluct[:, 3], "--k", lw=1)
+    plt.plot(dns_mean[:, 1], dns_fluct[:, 4], "-.k", lw=1)
+    plt.xlim(1, 1000)
+    plt.ylim(0, 2.5)
+    plt.ylabel(r"$\overline {v'v'}^+$, $\overline {w'w'}^+$")
+    plt.xlabel(r"$y^+$")
+    
+    plt.tight_layout()
+    
+    # Combined legend outside of the subplots
+    handles, labels = fig.axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.1))
+    
+    plt.subplots_adjust(bottom=0.45)  # Make space for the legend
+    
+    plt.savefig(join(SAVE_PATH, "re_rk.pdf"), bbox_inches="tight", pad_inches=0.02)
 
-plt.plot(dns_mean[:, 1], dns_fluct[:, 2], "k", lw=1, label="DNS")
-plt.plot(dns_mean[:, 1], dns_fluct[:, 5], "--k", lw=1)
-plt.xlim(1, 1000)
-plt.ylim(-1, 12)
-plt.ylabel(r"$\overline {u'u'}$, $\overline {u'v'}$")
-plt.xlabel(r"$y^+$")
-plt.legend()
+plot_re()
 
-plt.subplot(122)
-for i, name in enumerate(case_names):
-    plt.semilogx(
-        cases[name]["y+"],
-        cases[name]["vv"] / cases[name]["utau"] ** 2,
-        "--",
-        lw=1,
-        color="C" + str(i + 4),
-    )
-    plt.plot(
-        cases[name]["y+"],
-        cases[name]["ww"] / cases[name]["utau"] ** 2,
-        "-.",
-        lw=1,
-        color="C" + str(i + 4),
-    )
+# %%
 
+def plot_eps_num():
+    plt.figure(figsize=(5, 2.5))
+    
+    labels_ = ["pimpleFoam", "RKSymFoam"]
+    
+    for i, name in enumerate(["M1", "M1_rk"]):
+    
+        plt.subplot(121)
+        plt.semilogx(cases[name]["y+"][1:-1],
+                     cases[name]["eps_num"] / cases[name]["utau"]**4  * nu * 1000, lw=1, 
+                     color="C" + str(i+4), linestyle='-', label=labels_[i])
+        
+    plt.plot(dns_budget[:, 1],  dns_budget[:, -1]*1000, 'k', label="DNS", lw=1)
+    plt.legend()
+    plt.xlim(1, 1000)
+    plt.ylabel(r"$\epsilon^+_\mathrm{num} \cdot 10^3$")
+    plt.title("M1")
+    
+    
+    for i, name in enumerate(case_names[2:]):
+    
+        plt.subplot(122)
+        plt.semilogx(cases[name]["y+"][1:-1],
+                     cases[name]["eps_num"] / cases[name]["utau"]**4  * nu * 1000, lw=1, 
+                     color="C" + str(i+4), linestyle='-', label=labels_[i])
+    
+    plt.plot(dns_budget[:, 1],  dns_budget[:, -1]*1000, 'k', label="DNS", lw=1)
+    plt.title("M2")
+    plt.xlim(1, 1000)
+    plt.yticks([0, 0.5, 1, 1.5])
+    
+    plt.xlabel(r"$y^+$")
+    plt.xlim(0.2, 1000)
+    plt.tight_layout()
+    
+    plt.savefig(join(SAVE_PATH, "eps_num_rk.pdf"), bbox_inches='tight', pad_inches=0.02)
 
-plt.plot(dns_mean[:, 1], dns_fluct[:, 3], "--k", lw=1)
-plt.plot(dns_mean[:, 1], dns_fluct[:, 4], "-.k", lw=1)
-plt.xlim(1, 1000)
-plt.ylim(0, 2.5)
-plt.ylabel(r"$\overline {v'v'}$, $\overline {w'w'}$")
-plt.xlabel(r"$y^+$")
+plot_eps_num()
 
-plt.tight_layout()
-plt.savefig(join(SAVE_PATH, "re_rk.pdf"), bbox_inches="tight", pad_inches=0.02)
+# %%
+plt.figure(figsize=(5, 2.5))

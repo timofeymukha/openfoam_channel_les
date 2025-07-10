@@ -10,7 +10,7 @@ import h5py
 
 # %%
 
-DATA = "."
+DATA = ".."
 
 
 # %%

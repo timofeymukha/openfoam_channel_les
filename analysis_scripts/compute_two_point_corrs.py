@@ -17,7 +17,7 @@ plt.rcParams.update(
 
 
 # Path with the simulation cases
-DATA = "."
+DATA = ".."
 
 # Case directories
 case_names = [

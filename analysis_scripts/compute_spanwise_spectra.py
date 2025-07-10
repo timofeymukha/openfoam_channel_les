@@ -6,7 +6,7 @@ import h5py
 from scipy.signal import periodogram
 
 # %%
-DATA = "."
+DATA = ".."
 
 SAVE_PATH = "figures"
 

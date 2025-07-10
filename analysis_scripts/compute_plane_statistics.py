@@ -8,7 +8,7 @@ from scipy.stats import skew
 
 
 # Path with the simulation cases
-DATA = "."
+DATA = ".."
 
 # Case directories
 case_names = ["M1", "M2", "M3"]

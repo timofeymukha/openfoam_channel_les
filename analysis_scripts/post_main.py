@@ -14,13 +14,13 @@ plt.rcParams.update(
 
 
 # Path with the simulation cases
-DATA = "."
+DATA = ".."
 
 # Case directories
 case_names = ["M1", "M2", "M3"]
 
 # Path for saving figures
-SAVE_PATH = "figures"
+SAVE_PATH = "../figures"
 
 FIGSIZE = (5, 2.5)
 
@@ -235,7 +235,6 @@ cases = read_data()
 
 
 def delta_y():
-    intrp = interp1d(dns_mean[:, 0], dns_kolmogorov)
 
     fig = plt.figure(figsize=(2.5, 2.5))
 
@@ -407,7 +406,7 @@ def re_stresses():
     plt.plot(dns_mean[:, 1], dns_fluct[:, 5], "--k", lw=1)
     plt.xlim(1, 1000)
     plt.ylim(-1, 12)
-    plt.ylabel(r"$\overline {u'u'}$, $\overline {u'v'}$")
+    plt.ylabel(r"$\overline {u'u'}^+$, $\overline {u'v'}^+$")
     plt.xlabel(r"$y^+$")
     plt.legend()
 
@@ -470,7 +469,7 @@ def vorticity_fluctuations():
     plt.plot(dns_mean[:, 1], dns_omega[:, 5], "--k", lw=1)
     plt.xlim(1, 1000)
     plt.ylim(-0.01, 0.05)
-    plt.ylabel(r"$\overline {\omega_x'\omega_x'}$, $\overline {\omega_x'\omega_y'}$")
+    plt.ylabel(r"$\overline {\omega_x'\omega_x'}^+$, $\overline {\omega_x'\omega_y'}^+$")
     plt.xlabel(r"$y^+$")
     plt.legend()
 
@@ -498,7 +497,7 @@ def vorticity_fluctuations():
     plt.plot(dns_mean[:, 1], dns_omega[:, 4], "-.k", lw=1)
     plt.xlim(1, 1000)
     plt.ylim(0, 0.2)
-    plt.ylabel(r"$\overline {\omega_y'\omega_y'}$, $\overline {\omega_z'\omega_z'}$")
+    plt.ylabel(r"$\overline {\omega_y'\omega_y'}^+$, $\overline {\omega_z'\omega_z'}^+$")
     plt.xlabel(r"$y^+$")
     plt.tight_layout()
     plt.savefig(join(SAVE_PATH, "vorticity.pdf"), bbox_inches="tight", pad_inches=0.02)
@@ -507,7 +506,6 @@ def vorticity_fluctuations():
 vorticity_fluctuations()
 
 # %% k budget
-
 
 def k_budget():
 
@@ -850,7 +848,7 @@ def two_point_correlations():
         pad_inches=0.02,
     )
 
-
+two_point_correlations()
 # %% Re stress invariant map (Lumely tirangle)
 
 

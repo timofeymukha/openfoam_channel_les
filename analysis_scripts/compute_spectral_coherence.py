@@ -8,7 +8,7 @@ import numpy as np
 import h5py
 
 # %%
-DATA = "."
+DATA = ".."
 
 nu = 5e-5
 
