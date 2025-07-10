@@ -1,0 +1,99 @@
+// N.B. Discretisations should always reflect the discretisations used in the discrete momentum equation
+// Convective term budget consists of production and transport.
+// Similarly, the diffusive term budget consists of dissipation and viscous diffusion
+// These terms are derived from the continuous equations and applying the chain and product rule.
+// The resulting terms are a discrete reflection of the resulting continuous terms.
+// The values of these terms can change quite a lot depending on the choice for discretisation.
+
+discreteBudgets
+{
+    libs            ("libutilityFunctionObjects.so");
+    type            coded;
+    name            discreteBudgets;
+    writeControl    timeStep;
+
+    codeInclude
+    #{
+        #include "midPoint.H"
+        #include "reverseLinear.H"
+        #include "gaussConvectionScheme.H"
+        #include "gaussLaplacianScheme.H"
+        #include "uncorrectedSnGrad.H"
+        #include "orthogonalSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(FOAM_CASE)/system
+    #};
+
+    codeWrite
+    #{
+        #include "initBudgets.H"
+
+        // Split terms for production/transport and dissipation/viscous diffusion
+        volSymmTensorField& uiuj  = mesh().lookupObjectRef<volSymmTensorField>("uiuj");
+        volTensorField& djui      = mesh().lookupObjectRef<volTensorField>("djui");
+        volScalarField& djuidjui  = mesh().lookupObjectRef<volScalarField>("djuidjui");
+
+        // Momentum equation terms
+        volVectorField& Cui       = mesh().lookupObjectRef<volVectorField>("Cui");
+        volScalarField& uiCui     = mesh().lookupObjectRef<volScalarField>("uiCui");
+        volVectorField& Lui       = mesh().lookupObjectRef<volVectorField>("Lui");
+        volVectorField& LuiSgs       = mesh().lookupObjectRef<volVectorField>("LuiSgs");
+        volScalarField& uiLui     = mesh().lookupObjectRef<volScalarField>("uiLui");
+        volScalarField& uiLuiSgs     = mesh().lookupObjectRef<volScalarField>("uiLuiSgs");
+        volVectorField& Gcp       = mesh().lookupObjectRef<volVectorField>("Gcp");
+        volScalarField& uiGcp     = mesh().lookupObjectRef<volScalarField>("uiGcp");
+        surfaceScalarField& onef  = mesh().lookupObjectRef<surfaceScalarField>("onef");
+        volScalarField& nut  = mesh().lookupObjectRef<volScalarField>("nut");
+        auto & sij  = mesh().lookupObjectRef<volTensorField>("sij");
+        auto & nutsij  = mesh().lookupObjectRef<volTensorField>("nutsij");
+        auto & sijsij  = mesh().lookupObjectRef<volScalarField>("sijsij");
+        auto & nutsijsij  = mesh().lookupObjectRef<volScalarField>("nutsijsij");
+
+        // Read primary fields
+        volVectorField U(mesh().lookupObject<volVectorField>("U"));
+        surfaceScalarField phi(mesh().lookupObject<surfaceScalarField>("phi"));
+        volScalarField p(mesh().lookupObject<volScalarField>("p"));
+
+        // Calculate budget terms to be averaged
+        uiuj = symm(U * U);
+
+        djui = fv::gaussGrad<vector>::gradf(linear<vector>(mesh()).interpolate(U), "djui");
+
+        sij = 0.5*(fvc::grad(U) + fvc::grad(U)().T());
+        nutsij = nut * sij;
+        sijsij = sij && sij;
+
+        nutsijsij =  nut * sijsij;
+
+        djuidjui = djui && djui;
+
+        Cui = fv::gaussConvectionScheme<vector>
+        (
+            mesh(),
+            phi,
+            linear<vector>(mesh())
+        ).fvcDiv(phi, U);
+
+        uiCui = U & Cui;
+
+        Lui = fv::gaussLaplacianScheme<vector, scalar>
+        (
+            mesh(),
+            linear<scalar>(mesh()),
+            fv::orthogonalSnGrad<vector>(mesh())
+        ).fvcLaplacian(onef, U);
+
+        LuiSgs = fvc::laplacian(nut, U);
+
+        uiLui = U & Lui;
+        uiLuiSgs = U & LuiSgs;
+
+        Gcp = fv::gaussGrad<scalar>::gradf(linear<scalar>(mesh()).interpolate(p), "gcp");
+
+        uiGcp = U & Gcp;
+    #};
+}
+

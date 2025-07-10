@@ -1,0 +1,154 @@
+// N.B. Discretisations should always reflect the discretisations used in the discrete momentum equation
+// Convective term budget consists of production and transport.
+// Similarly, the diffusive term budget consists of dissipation and viscous diffusion
+// These terms are derived from the continuous equations and applying the chain and product rule.
+// The resulting terms are a discrete reflection of the resulting continuous terms.
+// The values of these terms can change quite a lot depending on the choice for discretisation.
+
+discreteBudgets
+{
+    libs            ("libutilityFunctionObjects.so");
+    type            coded;
+    name            discreteBudgets;
+    writeControl    timeStep;
+
+    codeInclude
+    #{
+        #include "midPoint.H"
+        #include "reverseLinear.H"
+        #include "gaussConvectionScheme.H"
+        #include "gaussLaplacianScheme.H"
+        #include "uncorrectedSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(FOAM_CASE)/system
+    #};
+
+    codeWrite
+    #{
+        #include "initBudgets.H"
+
+        // Split terms for production/transport and dissipation/viscous diffusion
+        volSymmTensorField& uiuj  = mesh().lookupObjectRef<volSymmTensorField>("uiuj");
+        volTensorField& djui      = mesh().lookupObjectRef<volTensorField>("djui");
+        volScalarField& djuidjui  = mesh().lookupObjectRef<volScalarField>("djuidjui");
+
+        // Momentum equation terms
+        volVectorField& Cui       = mesh().lookupObjectRef<volVectorField>("Cui");
+        volScalarField& uiCui     = mesh().lookupObjectRef<volScalarField>("uiCui");
+        volVectorField& Lui       = mesh().lookupObjectRef<volVectorField>("Lui");
+        volScalarField& uiLui     = mesh().lookupObjectRef<volScalarField>("uiLui");
+        volVectorField& Gcp       = mesh().lookupObjectRef<volVectorField>("Gcp");
+        volScalarField& uiGcp     = mesh().lookupObjectRef<volScalarField>("uiGcp");
+        surfaceScalarField& onef  = mesh().lookupObjectRef<surfaceScalarField>("onef");
+
+        // Read primary fields
+        volVectorField U(mesh().lookupObject<volVectorField>("U"));
+        surfaceScalarField phi(mesh().lookupObject<surfaceScalarField>("phi"));
+        volScalarField p(mesh().lookupObject<volScalarField>("p"));
+
+        // Calculate budget terms to be averaged
+        uiuj = symm(U * U);
+
+        djui = fv::gaussGrad<vector>::gradf(linear<vector>(mesh()).interpolate(U), "djui");
+
+        djuidjui = djui && djui;
+
+        Cui = fv::gaussConvectionScheme<vector>
+        (
+            mesh(),
+            phi,
+            midPoint<vector>(mesh())
+        ).fvcDiv(phi, U);
+
+        uiCui = U & Cui;
+
+        Lui = fv::gaussLaplacianScheme<vector, scalar>
+        (
+            mesh(),
+            reverseLinear<scalar>(mesh()),
+            fv::uncorrectedSnGrad<vector>(mesh())
+        ).fvcLaplacian(onef, U);
+
+        uiLui = U & Lui;
+
+        Gcp = fv::gaussGrad<scalar>::gradf(linear<scalar>(mesh()).interpolate(p), "gcp");
+
+        uiGcp = U & Gcp;
+    #};
+}
+
+timeAverage
+{
+    type            fieldAverage;
+    libs            ("fieldFunctionObjects.so");
+    writeControl    onEnd;
+    restartOnOutput false;
+    timeStart       15;
+
+    fields
+    (
+        U
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        uiuj
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        djui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        djuidjui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        Cui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        uiCui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        Lui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        uiLui
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        Gcp
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+        uiGcp
+        {
+            mean        on;
+            prime2Mean  off;
+            base        time;
+        }
+    );
+}
